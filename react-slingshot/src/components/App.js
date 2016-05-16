@@ -82,33 +82,29 @@ class TaskCompleted extends React.Component {
     this.deleteItem = this.deleteItem.bind(this);
   }
 
-  checkItem(name, index) {
+  checkItem(name, row) {
     var node = ReactDOM.findDOMNode(this.itemRef[name]);
-    this.props.onUnCompleteItem(node, index);
+    this.props.onUnCompleteItem(node, row);
   }
 
-  deleteItem(name, index) {
+  deleteItem(name, row) {
     var node = ReactDOM.findDOMNode(this.itemRef[name]);
-    this.props.onDeleteItem(node, index);
+    this.props.onDeleteItem(node, row);
   }
 
   renderTask(row, index) {
 
-    if (!row.completed) {
-      return <div />;
-    }
-
     const refItem = `item${index}`;
     return (
-      <ListItem ref={(el) => this.itemRef[refItem] = el} tappable category={row.category} >
+      <ListItem ref={(el) => this.itemRef[refItem] = el} key={refItem} tappable category={row.category} >
           <label className='left'>
-            <Input checked onClick={() => this.checkItem(refItem, index)} type='checkbox' />
+            <Input checked onClick={() => this.checkItem(refItem, row)} type='checkbox' />
           </label>
           <div className='center'>
             {row.title}
           </div>
           <div className='right'>
-            <Icon onClick={() => this.deleteItem(refItem, index)} style={{color: 'grey', paddingLeft: '4px'}} icon={{default: 'ion-ios-trash-outline', material:'md-delete'}} />
+            <Icon onClick={() => this.deleteItem(refItem, row)} style={{color: 'grey', paddingLeft: '4px'}} icon={{default: 'ion-ios-trash-outline', material:'md-delete'}} />
           </div>
         </ListItem>
     );
@@ -166,33 +162,31 @@ class TaskPending extends React.Component {
     this.deleteItem = this.deleteItem.bind(this);
   }
 
-  checkItem(name, index) {
+  checkItem(name, row) {
     var node = ReactDOM.findDOMNode(this.itemRef[name]);
-    this.props.onCompleteItem(node, index);
+    this.props.onCompleteItem(node, row);
   }
 
-  deleteItem(name, index) {
+  deleteItem(name, row) {
     var node = ReactDOM.findDOMNode(this.itemRef[name]);
-    this.props.onDeleteItem(node, index);
+    this.props.onDeleteItem(node, row);
 
   }
 
   renderTask(row, index) {
 
-    if (row.completed) {
-      return <div />;
-    }
-    const refItem = `item${index}`;
+    const refItem = `item${row.taskKey}`;
+    console.log(refItem);
     return (
-      <ListItem ref={(el) => this.itemRef[refItem] = el} tappable category={row.category} >
+      <ListItem ref={(el) => this.itemRef[refItem] = el} key={refItem} tappable category={row.category} >
           <label className='left'>
-            <Input onClick={() => this.checkItem(refItem, index)} type='checkbox' />
+            <Input onClick={() => this.checkItem(refItem, row)} type='checkbox' />
           </label>
           <div className='center'>
             {row.title}
           </div>
           <div className='right'>
-            <Icon onClick={() => this.deleteItem(refItem, index)} style={{color: 'grey', paddingLeft: '4px'}} icon={{default: 'ion-ios-trash-outline', material:'md-delete'}} />
+            <Icon onClick={() => this.deleteItem(refItem, row)} style={{color: 'grey', paddingLeft: '4px'}} icon={{default: 'ion-ios-trash-outline', material:'md-delete'}} />
           </div>
         </ListItem>
     );
@@ -208,23 +202,27 @@ class TaskPending extends React.Component {
   }
 };
 
-
 class PageContent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
   render() {
+    console.log('uncompleted');
+    console.log(this.props.unCompletedTasks);
+    console.log(this.props.completedTasks);
+
+
     return (
       <Tabbar
         position='bottom'
         renderTabs={(activeIndex, tabbar) => [
           {
-            content: <TaskPending {...this.props} />,
+            content: <TaskPending {...this.props} tasks={this.props.unCompletedTasks} />,
             tab: <Tab label="Pending" />
             },
             {
-              content: <TaskCompleted {...this.props} />,
+              content: <TaskCompleted {...this.props} tasks={this.props.completedTasks} />,
               tab: <Tab label="Completed" />
               }]
         } />
@@ -268,14 +266,14 @@ class FirstPage extends React.Component {
     this.completeItem = this.completeItem.bind(this);
     this.unCompleteItem = this.unCompleteItem.bind(this);
     this.state = {
-    tasks: [
+    unCompletedTasks: [
         {
           title: 'Download OnsenUI',
           category: 'Programming',
           description: 'Some description.',
           highlight: false,
           urgent: false,
-          completed: false,
+          taskKey: 0,
         },
         {
           title: 'Install Monaca CLI',
@@ -283,7 +281,7 @@ class FirstPage extends React.Component {
           description: 'Some description.',
           highlight: false,
           urgent: false,
-          completed: true,
+          taskKey: 1,
         },
         {
           title: 'Star Onsen UI repo on Github',
@@ -291,7 +289,7 @@ class FirstPage extends React.Component {
           description: 'Some description.',
           highlight: false,
           urgent: false,
-          completed: false,
+          taskKey: 2,
         },
         {
           title: 'Register in the community forum',
@@ -299,7 +297,7 @@ class FirstPage extends React.Component {
           description: 'Some description.',
           highlight: false,
           urgent: false,
-          completed: false,
+          taskKey: 3,
         },
         {
           title: 'Send donations to Fran and Andreas',
@@ -307,7 +305,7 @@ class FirstPage extends React.Component {
           description: 'Some description.',
           highlight: false,
           urgent: false,
-          completed: false,
+          taskKey: 4,
         },
         {
           title: 'Profit',
@@ -315,7 +313,7 @@ class FirstPage extends React.Component {
           description: 'Some description.',
           highlight: false,
           urgent: false,
-          completed: false,
+          taskKey: 5,
         },
         {
           title: 'Visit Japan',
@@ -323,7 +321,7 @@ class FirstPage extends React.Component {
           description: 'Some description.',
           highlight: false,
           urgent: false,
-          completed: false
+          taskKey: 6,
         },
         {
           title: 'Enjoy an Onsen with Onsen UI team',
@@ -331,13 +329,16 @@ class FirstPage extends React.Component {
           description: 'Some description.',
           highlight: false,
           urgent: false,
-          completed: false
+          taskKey: 7,
         }
-      ]
+    ],
+    completedTasks: [
+
+    ]
     };
   }
 
-  deleteItem(node, index) {
+  deleteItem(node, rowData) {
 
     node.classList.add('animation-remove');
     node.classList.add('hide-children');
@@ -348,11 +349,23 @@ class FirstPage extends React.Component {
 
       var arr = this.state.tasks;
       arr.splice(index, 1);
-      this.setState({ tasks: arr });
+
+
+     var arr1 = this.state.completedTasks
+     .filter((el) => el.taskKey !== rowData.taskKey);
+
+     var arr2 = this.state.unCompletedTasks
+      .filter((el) => el.taskKey !== rowData.taskKey);
+
+      this.setState({
+        completedTasks: arr1,
+        unCompletedTasks: arr2
+      });
+
     }, 750);
   }
 
-  completeItem(node, index) {
+  completeItem(node, rowData) {
    var animation = 'animation-swipe-right';
    node.classList.add('hide-children');
    node.classList.add(animation);
@@ -361,13 +374,21 @@ class FirstPage extends React.Component {
      node.classList.remove(animation);
      node.classList.remove('hide-children');
 
-     var arr = this.state.tasks;
-     arr[index].completed = true;
-     this.setState({ tasks: arr });
+     var arr1 = this.state.unCompletedTasks
+      .filter((el) => el.taskKey !== rowData.taskKey);
+     var arr2 = this.state.completedTasks.slice();
+     arr2.push(rowData);
+
+     this.setState({
+       unCompletedTasks: arr1,
+       completedTasks: arr2
+
+     });
+
    }, 950);
   }
 
-  unCompleteItem(node, index) {
+  unCompleteItem(node, rowData) {
    var animation = 'animation-swipe-left';
    node.classList.add('hide-children');
    node.classList.add(animation);
@@ -376,9 +397,16 @@ class FirstPage extends React.Component {
      node.classList.remove(animation);
      node.classList.remove('hide-children');
 
-     var arr = this.state.tasks;
-     arr[index].completed = false;
-     this.setState({ tasks: arr });
+     var arr1 = this.state.completedTasks
+      .filter((el) => el.taskKey !== rowData.taskKey);
+     var arr2 = this.state.unCompletedTasks.slice();
+     arr2.push(rowData);
+
+     this.setState({
+       completedTasks: arr1,
+       unCompletedTasks: arr2,
+     });
+
    }, 950);
   }
 
@@ -390,7 +418,7 @@ class FirstPage extends React.Component {
             <Menu />
           </SplitterSide>
           <SplitterContent>
-            <Content tasks={this.state.tasks} onUnCompleteItem={this.unCompleteItem} onCompleteItem={this.completeItem} onDeleteItem={this.deleteItem} />
+            <Content unCompletedTasks={this.state.unCompletedTasks} completedTasks={this.state.completedTasks} onUnCompleteItem={this.unCompleteItem} onCompleteItem={this.completeItem} onDeleteItem={this.deleteItem} />
           </SplitterContent>
         </Splitter>
       </Page>
