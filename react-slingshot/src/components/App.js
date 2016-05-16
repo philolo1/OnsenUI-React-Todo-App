@@ -347,10 +347,6 @@ class FirstPage extends React.Component {
       node.classList.remove('animation-remove');
       node.classList.remove('hide-children');
 
-      var arr = this.state.tasks;
-      arr.splice(index, 1);
-
-
      var arr1 = this.state.completedTasks
      .filter((el) => el.taskKey !== rowData.taskKey);
 
