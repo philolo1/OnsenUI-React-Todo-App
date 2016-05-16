@@ -128,15 +128,16 @@ class TaskCompleted extends React.Component {
     const refItem = `item${row.taskKey}`;
     return (
       <ListItem
-        onClick={() => this.props.onItemClick(row)}
         ref={(el) => this.itemRef[refItem] = el}
         key={refItem}
         tappable
         category={row.category} >
-          <label className='left'>
+        <label className='left'
+          >
             <Input checked onClick={() => this.checkItem(refItem, row)} type='checkbox' />
           </label>
-          <div className='center'>
+          <div className='center'
+            onClick={() => this.props.onItemClick(row)} >
             {row.title}
           </div>
           <div className='right'>
@@ -214,12 +215,12 @@ class TaskPending extends React.Component {
     const refItem = `item${row.taskKey}`;
     return (
       <ListItem
-        onClick={() => this.props.onItemClick(row)}
         ref={(el) => this.itemRef[refItem] = el} key={refItem} tappable category={row.category} >
           <label className='left'>
             <Input onClick={() => this.checkItem(refItem, row)} type='checkbox' />
           </label>
-          <div className='center'>
+          <div className='center'
+          onClick={() => this.props.onItemClick(row)}>
             {row.title}
           </div>
           <div className='right'>
@@ -301,15 +302,23 @@ class Content extends React.Component {
   }
 };
 
+
 class NewTask extends React.Component {
   constructor(props) {
     super(props);
-    this.addTask = this.addTask.bind(this);
+    this.action = this.action.bind(this);
+
+    var {title, category, description} = this.props.taskData;
+
     this.state = {
       urgent: false,
+      title: title,
+      category: category,
+      description: description
     };
   }
-  addTask() {
+
+  action() {
 
 
     if (!this.state.title || this.state.title.length == 0) {
@@ -317,13 +326,23 @@ class NewTask extends React.Component {
       return;
     }
 
-    this.props.prevPage.addTask(
-      this.state.title,
-      this.state.category,
-      this.state.description
-    );
+
+    if (this.props.editMode) {
+      this.props.prevPage.editTask(this.props.taskData.taskKey,
+                                   this.state.title,
+                                   this.state.category,
+                                   this.state.description);
+    } else {
+      this.props.prevPage.addTask(
+        this.state.title,
+        this.state.category,
+        this.state.description
+      );
+    }
+
     this.props.navigator.popPage();
   }
+
   render() {
     return (
       <Page id="newTaskPage"
@@ -331,11 +350,6 @@ class NewTask extends React.Component {
           () => <Toolbar>
             <div className="left"><BackButton>Back</BackButton></div>
             <div className="center">{this.props.title}</div>
-            <div className="right">
-              <ToolbarButton onClick={this.addTask}>
-                <Icon icon="md-save" />
-              </ToolbarButton>
-            </div>
           </Toolbar>
           }>
 
@@ -374,15 +388,25 @@ class NewTask extends React.Component {
                 </ListItem>
                 );
             }} />
-          <Button modifier="large" onClick={this.addTask}>Add New Task</Button>
+          <Button modifier="large" onClick={this.action}>
+            { this.props.editMode?
+              'Save Task' :
+                'Add New Task'
+            }
+              </Button>
         </Page>
     );
   }
 };
 
+NewTask.defaultProps = {
+  taskData: {}
+};
+
 class FirstPage extends React.Component {
   constructor(props) {
     super(props);
+    this.counter = 7;
     this.deleteItem = this.deleteItem.bind(this);
     this.newClick = this.newClick.bind(this);
     this.completeItem = this.completeItem.bind(this);
@@ -392,6 +416,7 @@ class FirstPage extends React.Component {
     this.changeMenuItem = this.changeMenuItem.bind(this);
     this.filter = this.filter.bind(this);
     this.addTask = this.addTask.bind(this);
+    this.editTask = this.editTask.bind(this);
     this.state = {
       filter:
         {
@@ -474,16 +499,46 @@ class FirstPage extends React.Component {
     this.props.navigator.pushPage({
       prevPage: this,
       component: NewTask,
-      title: 'Task Details'
+      title: 'Task Details',
+      editMode: true,
+      taskData: rowData,
     }, {animation: 'lift' });
+  }
+
+
+  updateArr(tasks, taskKey, title, category, description) {
+    return tasks.map( (el) => {
+      if (el.taskKey != taskKey) return el;
+      return {
+        title: title,
+        category: category,
+        description: description,
+        taskKey: taskKey
+      }
+    });
+  }
+
+  editTask(taskKey, title, category, description) {
+    var tasks = this.state.unCompletedTasks.slice();
+    var tasks2 = this.state.completedTasks.slice();
+
+    tasks = this.updateArr(tasks, taskKey, title, category, description);
+    tasks2 = this.updateArr(tasks2, taskKey, title, category, description);
+
+    this.setState({
+      unCompletedTasks: tasks,
+      completedTasks: tasks2
+    });
   }
 
   addTask(title, category, description) {
     var tasks = this.state.unCompletedTasks.slice();
+    this.counter++;
     tasks.push({
       title: title,
       category: category,
-      description: description
+      description: description,
+      taskKey: this.counter
     });
 
     this.setState({
@@ -656,6 +711,8 @@ const App = (props) => {
           prevPage: route.prevPage,
           navigator: navigator,
           title: route.title,
+          taskData: route.taskData,
+          editMode: route.editMode
         });
       }} />
   );
