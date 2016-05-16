@@ -125,10 +125,14 @@ class TaskCompleted extends React.Component {
   }
 
   renderTask(row, index) {
-
     const refItem = `item${row.taskKey}`;
     return (
-      <ListItem ref={(el) => this.itemRef[refItem] = el} key={refItem} tappable category={row.category} >
+      <ListItem
+        onClick={() => this.props.onItemClick(row)}
+        ref={(el) => this.itemRef[refItem] = el}
+        key={refItem}
+        tappable
+        category={row.category} >
           <label className='left'>
             <Input checked onClick={() => this.checkItem(refItem, row)} type='checkbox' />
           </label>
@@ -209,7 +213,9 @@ class TaskPending extends React.Component {
 
     const refItem = `item${row.taskKey}`;
     return (
-      <ListItem ref={(el) => this.itemRef[refItem] = el} key={refItem} tappable category={row.category} >
+      <ListItem
+        onClick={() => this.props.onItemClick(row)}
+        ref={(el) => this.itemRef[refItem] = el} key={refItem} tappable category={row.category} >
           <label className='left'>
             <Input onClick={() => this.checkItem(refItem, row)} type='checkbox' />
           </label>
@@ -324,7 +330,7 @@ class NewTask extends React.Component {
         renderToolbar={
           () => <Toolbar>
             <div className="left"><BackButton>Back</BackButton></div>
-            <div className="center">New Task</div>
+            <div className="center">{this.props.title}</div>
             <div className="right">
               <ToolbarButton onClick={this.addTask}>
                 <Icon icon="md-save" />
@@ -381,6 +387,7 @@ class FirstPage extends React.Component {
     this.newClick = this.newClick.bind(this);
     this.completeItem = this.completeItem.bind(this);
     this.getCategories = this.getCategories.bind(this);
+    this.itemClick = this.itemClick.bind(this);
     this.unCompleteItem = this.unCompleteItem.bind(this);
     this.changeMenuItem = this.changeMenuItem.bind(this);
     this.filter = this.filter.bind(this);
@@ -461,6 +468,14 @@ class FirstPage extends React.Component {
 
     ]
     };
+  }
+
+  itemClick(rowData) {
+    this.props.navigator.pushPage({
+      prevPage: this,
+      component: NewTask,
+      title: 'Task Details'
+    }, {animation: 'lift' });
   }
 
   addTask(title, category, description) {
@@ -592,7 +607,8 @@ class FirstPage extends React.Component {
     this.props.navigator.pushPage(
       {
         prevPage: this,
-        component: NewTask
+        component: NewTask,
+        title: 'New Task'
       });
   }
 
@@ -614,6 +630,7 @@ class FirstPage extends React.Component {
           </SplitterSide>
           <SplitterContent>
             <Content
+              onItemClick={this.itemClick}
               onNewClick={this.newClick}
               onMenuClick={() => this.setState({menuOpen: true})}
               unCompletedTasks={this.filter(this.state.unCompletedTasks)}
@@ -637,7 +654,8 @@ const App = (props) => {
       renderPage={(route, navigator) => {
         return React.createElement(route.component, {
           prevPage: route.prevPage,
-          navigator: navigator
+          navigator: navigator,
+          title: route.title,
         });
       }} />
   );
