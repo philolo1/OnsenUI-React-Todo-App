@@ -246,10 +246,6 @@ class PageContent extends React.Component {
     this.state = {};
   }
   render() {
-    console.log('uncompleted');
-    console.log(this.props.unCompletedTasks);
-    console.log(this.props.completedTasks);
-
     return (
       <Tabbar
         position='bottom'
@@ -366,7 +362,7 @@ class NewTask extends React.Component {
                 fieldName: 'category'
               },
               {
-                placeholder: 'I want to ...',
+                placeholder: 'Description',
                 fieldName: 'description'
               }
             ]}
@@ -557,7 +553,6 @@ class FirstPage extends React.Component {
       tasks.push(this.state.filter.name);
     }
     tasks = _.uniq(tasks);
-    console.log(tasks);
     return tasks;
   }
 
@@ -658,7 +653,6 @@ class FirstPage extends React.Component {
 
   newClick() {
     let navigator = this.props.navigator;
-     console.log(navigator);
     this.props.navigator.pushPage(
       {
         prevPage: this,
