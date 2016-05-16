@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import ReactDOM from 'react-dom';
+import _ from 'underscore';
 import { Link, IndexLink } from 'react-router';
 import {
   Page,
@@ -19,31 +20,58 @@ import {
   SplitterSide
 } from 'react-onsenui';
 
-
-
-
 class Menu extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
     this.renderRow = this.renderRow.bind(this);
+    this.renderCategories = this.renderCategories.bind(this);
+  }
+
+  renderCategories(rowName, idx) {
+
+    return (
+        <ListItem
+          onClick={() => this.props.onClickMenuItem({mode: 'custom', name: rowName})}
+          tappable
+          >
+          <div class="left">
+            <Input type="radio" name="categoryGroup" inputId="r-all"
+              checked={ this.props.name === rowName }
+            />
+          </div>
+          <label class="center" for="r-all"> {rowName} </label>
+        </ListItem>
+      );
   }
 
   renderRow(row, idx) {
     if (idx == 0) {
       return (
-        <ListItem tappable>
+        <ListItem
+          onClick={() => this.props.onClickMenuItem({mode: 'default', name: 'All'})}
+          tappable
+          >
           <div class="left">
-            <Input type="radio" name="categoryGroup" inputId="r-all" checked />
+            <Input type="radio" name="categoryGroup" inputId="r-all"
+              checked={this.props.mode == 'default' &&
+                this.props.name === 'All'
+              }
+            />
           </div>
           <label class="center" for="r-all">All</label>
         </ListItem>
       );
     } else {
       return (
-        <ListItem tappable category-id="">
+        <ListItem tappable category-id=""
+          onClick={() => this.props.onClickMenuItem({mode: 'default', name: 'No category'})}>
           <div class="left">
-            <Input type="radio" name="categoryGroup" input-id="r-no" />
+            <Input type="radio" name="categoryGroup" input-id="r-no"
+              checked={this.props.mode == 'default' &&
+                this.props.name === 'No category'
+              }
+            />
           </div>
           <label class="center" for="r-no">No category</label>
         </ListItem>
@@ -62,12 +90,12 @@ class Menu extends React.Component {
           renderRow={this.renderRow}
         />
         <List
-          dataSource={[]}
+          dataSource={this.props.categories}
           id="custom-category-list"
           renderHeader={
             () => <ListHeader>Custom categories </ListHeader>
             }
-            renderRow={() => <div />}
+            renderRow={this.renderCategories}
           />
       </Page>
     );
@@ -94,7 +122,7 @@ class TaskCompleted extends React.Component {
 
   renderTask(row, index) {
 
-    const refItem = `item${index}`;
+    const refItem = `item${row.taskKey}`;
     return (
       <ListItem ref={(el) => this.itemRef[refItem] = el} key={refItem} tappable category={row.category} >
           <label className='left'>
@@ -176,7 +204,6 @@ class TaskPending extends React.Component {
   renderTask(row, index) {
 
     const refItem = `item${row.taskKey}`;
-    console.log(refItem);
     return (
       <ListItem ref={(el) => this.itemRef[refItem] = el} key={refItem} tappable category={row.category} >
           <label className='left'>
@@ -212,7 +239,6 @@ class PageContent extends React.Component {
     console.log(this.props.unCompletedTasks);
     console.log(this.props.completedTasks);
 
-
     return (
       <Tabbar
         position='bottom'
@@ -234,7 +260,13 @@ class Content extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
+    this.openMenu = this.openMenu.bind(this);
   }
+
+  openMenu() {
+    this.props.onMenuClick();
+  }
+
   render() {
     return (
       <Page
@@ -242,7 +274,7 @@ class Content extends React.Component {
         renderToolbar={() =>
    <Toolbar>
      <div className='left'>
-       <ToolbarButton component="button/menu">
+       <ToolbarButton component="button/menu" onClick={this.openMenu}>
          <Icon icon={{default: 'ion-navicon', material:'md-menu'}} size={{default: 32, material:24}} />
        </ToolbarButton>
      </div>
@@ -253,7 +285,7 @@ class Content extends React.Component {
        </ons-if>
      </div>
    </Toolbar> } >
-   <PageContent {...this.props} />
+   <PageContent ref='menu' {...this.props} />
   </Page>
    );
   }
@@ -264,8 +296,17 @@ class FirstPage extends React.Component {
     super(props);
     this.deleteItem = this.deleteItem.bind(this);
     this.completeItem = this.completeItem.bind(this);
+    this.getCategories = this.getCategories.bind(this);
     this.unCompleteItem = this.unCompleteItem.bind(this);
+    this.changeMenuItem = this.changeMenuItem.bind(this);
+    this.filter = this.filter.bind(this);
     this.state = {
+      filter:
+        {
+          mode: 'default',
+          name: 'All',
+          func: () => true
+        },
     unCompletedTasks: [
         {
           title: 'Download OnsenUI',
@@ -309,7 +350,6 @@ class FirstPage extends React.Component {
         },
         {
           title: 'Profit',
-          category: '',
           description: 'Some description.',
           highlight: false,
           urgent: false,
@@ -336,6 +376,47 @@ class FirstPage extends React.Component {
 
     ]
     };
+  }
+
+  filter(arr) {
+    return arr.filter(this.state.filter.func);
+  }
+
+  getCategories() {
+    var tasks = this.state.unCompletedTasks.concat(this.state.completedTasks);
+    tasks = tasks.map((el) => el.category).filter( (el) => el != null);
+    if (this.state.filter.mode == 'custom') {
+      tasks.push(this.state.filter.name);
+    }
+    tasks = _.uniq(tasks);
+    console.log(tasks);
+    return tasks;
+  }
+
+  changeMenuItem(data) {
+    let fun;
+
+    if (data.mode == 'default') {
+      if (data.name == 'All') {
+        fun = () => true;
+      } else {
+        fun = (el) => (el.category == null);
+      }
+
+    } else {
+      fun = (el) => (el.category == data.name);
+    }
+
+    var filterData = {
+      name: data.name,
+      mode: data.mode,
+      func: fun
+    };
+
+    this.setState({
+      filter: filterData
+    });
+
   }
 
   deleteItem(node, rowData) {
@@ -409,19 +490,33 @@ class FirstPage extends React.Component {
   render() {
     return (
       <Page>
-        <Splitter id="mySplitter">
-          <SplitterSide  isSwipeable={true} width="250px" isCollapsed={true} swipeTargetWidth={50}>
-            <Menu />
+        <Splitter ref='splitter' id="mySplitter">
+          <SplitterSide
+            onOpen={
+              () => this.setState({menuOpen: true})
+            }
+            onClose={
+              () => this.setState({menuOpen: false})
+            }
+            isOpen={this.state.menuOpen} isSwipeable={true} width="250px" isCollapsed={true} swipeTargetWidth={50}>
+            <Menu  categories={this.getCategories()} {...this.state.filter}
+              onClickMenuItem={this.changeMenuItem}
+            />
           </SplitterSide>
           <SplitterContent>
-            <Content unCompletedTasks={this.state.unCompletedTasks} completedTasks={this.state.completedTasks} onUnCompleteItem={this.unCompleteItem} onCompleteItem={this.completeItem} onDeleteItem={this.deleteItem} />
+            <Content
+              onMenuClick={() => this.setState({menuOpen: true})}
+              unCompletedTasks={this.filter(this.state.unCompletedTasks)}
+              completedTasks={this.filter(this.state.completedTasks)}
+              onUnCompleteItem={this.unCompleteItem}
+              onCompleteItem={this.completeItem}
+              onDeleteItem={this.deleteItem} />
           </SplitterContent>
         </Splitter>
       </Page>
     );
   }
 };
-
 
 const App = (props) => {
   return (
@@ -430,7 +525,6 @@ const App = (props) => {
         component: FirstPage
       }}
       renderPage={(route, navigator) => {
-        // console.log(route);
         return React.createElement(route.component);
       }} />
   );
