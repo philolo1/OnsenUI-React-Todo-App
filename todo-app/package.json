@@ -6,6 +6,7 @@
     "onsenui": "^2.0.0-rc.4",
     "react": "^15.0.1",
     "react-dom": "^15.0.1",
-    "react-onsenui": "0.2.1"
+    "react-onsenui": "0.2.1",
+    "underscore": "^1.8.3"
   }
 }
