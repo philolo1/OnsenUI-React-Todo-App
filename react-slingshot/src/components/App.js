@@ -2,12 +2,16 @@ import React, { PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'underscore';
 import { Link, IndexLink } from 'react-router';
+
+import ons from 'onsenui';
 import {
+  Button,
   Page,
   List,
   Input,
   ListHeader,
   Tab,
+  Switch,
   ListItem,
   BackButton,
   Icon,
@@ -35,12 +39,12 @@ class Menu extends React.Component {
           onClick={() => this.props.onClickMenuItem({mode: 'custom', name: rowName})}
           tappable
           >
-          <div class="left">
+          <div className="left">
             <Input type="radio" name="categoryGroup" inputId="r-all"
               checked={ this.props.name === rowName }
             />
           </div>
-          <label class="center" for="r-all"> {rowName} </label>
+          <label className="center" for="r-all"> {rowName} </label>
         </ListItem>
       );
   }
@@ -52,7 +56,7 @@ class Menu extends React.Component {
           onClick={() => this.props.onClickMenuItem({mode: 'default', name: 'All'})}
           tappable
           >
-          <div class="left">
+          <div className="left">
             <Input type="radio" name="categoryGroup" inputId="r-all"
               checked={this.props.mode == 'default' &&
                 this.props.name === 'All'
@@ -66,14 +70,14 @@ class Menu extends React.Component {
       return (
         <ListItem tappable category-id=""
           onClick={() => this.props.onClickMenuItem({mode: 'default', name: 'No category'})}>
-          <div class="left">
+          <div className="left">
             <Input type="radio" name="categoryGroup" input-id="r-no"
               checked={this.props.mode == 'default' &&
                 this.props.name === 'No category'
               }
             />
           </div>
-          <label class="center" for="r-no">No category</label>
+          <label className="center" for="r-no">No category</label>
         </ListItem>
       );
     }
@@ -281,7 +285,7 @@ class Content extends React.Component {
      <div className="center">To-Do List App 2.0</div>
      <div className="right">
        <ons-if platform="ios other">
-         <ToolbarButton component="button/new-task">New</ToolbarButton>
+         <ToolbarButton onClick={this.props.onNewClick} component="button/new-task">New</ToolbarButton>
        </ons-if>
      </div>
    </Toolbar> } >
@@ -291,15 +295,96 @@ class Content extends React.Component {
   }
 };
 
+class NewTask extends React.Component {
+  constructor(props) {
+    super(props);
+    this.addTask = this.addTask.bind(this);
+    this.state = {
+      urgent: false,
+    };
+  }
+  addTask() {
+
+
+    if (!this.state.title || this.state.title.length == 0) {
+      ons.notification.alert('You must provide a task title.');
+      return;
+    }
+
+    this.props.prevPage.addTask(
+      this.state.title,
+      this.state.category,
+      this.state.description
+    );
+    this.props.navigator.popPage();
+  }
+  render() {
+    return (
+      <Page id="newTaskPage"
+        renderToolbar={
+          () => <Toolbar>
+            <div className="left"><BackButton>Back</BackButton></div>
+            <div className="center">New Task</div>
+            <div className="right">
+              <ToolbarButton onClick={this.addTask}>
+                <Icon icon="md-save" />
+              </ToolbarButton>
+            </div>
+          </Toolbar>
+          }>
+
+
+          <List
+            renderHeader={() => <ListHeader> Add a new task </ListHeader>}
+            dataSource={[
+              {
+                placeholder: 'I want to',
+                fieldName: 'title'
+              },
+              {
+                placeholder: 'Category',
+                fieldName: 'category'
+              },
+              {
+                placeholder: 'I want to ...',
+                fieldName: 'description'
+              }
+            ]}
+            renderRow={(data) => {
+              return (
+                <ListItem modifier="nodivider">
+                  <div className='center'>
+                    <Input
+                      id="category-input"
+                      type="text"
+                      value={this.state[data.fieldName]}
+                      onChange={(event) => {
+                        var newData = {};
+                        newData[data.fieldName] = event.target.value;
+                        this.setState(newData);
+                      }}
+                      placeholder={data.placeholder} float />
+                  </div>
+                </ListItem>
+                );
+            }} />
+          <Button modifier="large" onClick={this.addTask}>Add New Task</Button>
+        </Page>
+    );
+  }
+};
+
 class FirstPage extends React.Component {
   constructor(props) {
     super(props);
     this.deleteItem = this.deleteItem.bind(this);
+    this.newClick = this.newClick.bind(this);
     this.completeItem = this.completeItem.bind(this);
     this.getCategories = this.getCategories.bind(this);
     this.unCompleteItem = this.unCompleteItem.bind(this);
     this.changeMenuItem = this.changeMenuItem.bind(this);
     this.filter = this.filter.bind(this);
+    this.addTask = this.addTask.bind(this);
     this.state = {
       filter:
         {
@@ -376,6 +461,19 @@ class FirstPage extends React.Component {
 
     ]
     };
+  }
+
+  addTask(title, category, description) {
+    var tasks = this.state.unCompletedTasks.slice();
+    tasks.push({
+      title: title,
+      category: category,
+      description: description
+    });
+
+    this.setState({
+      unCompletedTasks: tasks
+    });
   }
 
   filter(arr) {
@@ -465,6 +563,7 @@ class FirstPage extends React.Component {
    }, 950);
   }
 
+
   unCompleteItem(node, rowData) {
    var animation = 'animation-swipe-left';
    node.classList.add('hide-children');
@@ -487,6 +586,16 @@ class FirstPage extends React.Component {
    }, 950);
   }
 
+  newClick() {
+    let navigator = this.props.navigator;
+     console.log(navigator);
+    this.props.navigator.pushPage(
+      {
+        prevPage: this,
+        component: NewTask
+      });
+  }
+
   render() {
     return (
       <Page>
@@ -505,6 +614,7 @@ class FirstPage extends React.Component {
           </SplitterSide>
           <SplitterContent>
             <Content
+              onNewClick={this.newClick}
               onMenuClick={() => this.setState({menuOpen: true})}
               unCompletedTasks={this.filter(this.state.unCompletedTasks)}
               completedTasks={this.filter(this.state.completedTasks)}
@@ -525,7 +635,10 @@ const App = (props) => {
         component: FirstPage
       }}
       renderPage={(route, navigator) => {
-        return React.createElement(route.component);
+        return React.createElement(route.component, {
+          prevPage: route.prevPage,
+          navigator: navigator
+        });
       }} />
   );
 };
