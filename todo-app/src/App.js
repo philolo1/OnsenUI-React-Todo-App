@@ -5,6 +5,7 @@ import _ from 'underscore';
 import ons from 'onsenui';
 import {
   Button,
+  Fab,
   Page,
   List,
   Input,
@@ -33,17 +34,19 @@ class Menu extends React.Component {
 
   renderCategories(rowName, idx) {
 
+    const inputId = `rr-${rowName}`;
+
     return (
         <ListItem
           onClick={() => this.props.onClickMenuItem({mode: 'custom', name: rowName})}
           tappable
           >
           <div className="left">
-            <Input type="radio" name="categoryGroup" inputId="r-all"
+            <Input type="radio" name="categoryGroup" inputId={inputId}
               checked={ this.props.name === rowName }
             />
           </div>
-          <label className="center" htmlFor="r-all"> {rowName} </label>
+          <label className="center" htmlFor={inputId}> {rowName} </label>
         </ListItem>
       );
   }
@@ -57,7 +60,7 @@ class Menu extends React.Component {
           >
           <div className="left">
             <Input type="radio" name="categoryGroup" inputId="r-all"
-              checked={this.props.mode == 'default' &&
+              checked={this.props.mode === 'default' &&
                 this.props.name === 'All'
               }
             />
@@ -71,7 +74,7 @@ class Menu extends React.Component {
           onClick={() => this.props.onClickMenuItem({mode: 'default', name: 'No category'})}>
           <div className="left">
             <Input type="radio" name="categoryGroup" input-id="r-no"
-              checked={this.props.mode == 'default' &&
+              checked={this.props.mode === 'default' &&
                 this.props.name === 'No category'
               }
             />
@@ -86,7 +89,7 @@ class Menu extends React.Component {
     return (
       <Page id="menuPage">
         <List id="default-category-list"
-          dataSource={[0,1]}
+          dataSource={[0, 1]}
           renderHeader={() =>
             <ListHeader>Default</ListHeader>
           }
@@ -146,8 +149,18 @@ class TaskCompleted extends React.Component {
     );
   }
   render() {
+    let newButton;
+    if (ons.platform.isAndroid()) {
+      newButton = <Fab
+        onClick={this.props.onNewClick}
+        position="right bottom" >
+      <Icon icon="md-edit" />
+     </Fab>
+    }
+
     return (
       <Page>
+        {newButton}
         <List
           dataSource={this.props.tasks}
           renderRow={this.renderTask} />
@@ -229,8 +242,18 @@ class TaskPending extends React.Component {
     );
   }
   render() {
+    let newButton;
+    if (ons.platform.isAndroid()) {
+      newButton = <Fab
+        onClick={this.props.onNewClick}
+        position="right bottom" >
+      <Icon icon="md-edit" />
+     </Fab>
+    }
+
     return (
       <Page>
+        {newButton}
         <List
           dataSource={this.props.tasks}
           renderRow={this.renderTask} />
@@ -245,6 +268,7 @@ class PageContent extends React.Component {
     this.state = {};
   }
   render() {
+
     return (
       <Tabbar
         position='bottom'
@@ -274,26 +298,35 @@ class Content extends React.Component {
   }
 
   render() {
+    let newButton;
+    if (!ons.platform.isAndroid()) {
+      newButton = <ToolbarButton
+        onClick={this.props.onNewClick}
+        component="button/new-task">
+        New
+      </ToolbarButton>;
+    }
+
     return (
       <Page
         id='tabbarPage'
         renderToolbar={() =>
-   <Toolbar>
-     <div className='left'>
-       <ToolbarButton component="button/menu" onClick={this.openMenu}>
-         <Icon icon={{default: 'ion-navicon', material:'md-menu'}} size={{default: 32, material:24}} />
-       </ToolbarButton>
-     </div>
-     <div className="center">React To-Do List App</div>
-     <div className="right">
-       <ons-if platform="ios other">
-         <ToolbarButton onClick={this.props.onNewClick} component="button/new-task">New</ToolbarButton>
-       </ons-if>
-     </div>
-   </Toolbar> } >
-   <PageContent ref='menu' {...this.props} />
-  </Page>
-   );
+          <Toolbar>
+            <div className='left'>
+              <ToolbarButton component="button/menu" onClick={this.openMenu}>
+                <Icon
+                  icon={{default: 'ion-navicon', material: 'md-menu'}}
+                  size={{default: 32, material: 24}} />
+              </ToolbarButton>
+            </div>
+            <div className="center">React To-Do List App</div>
+            <div className="right">
+              {newButton}
+            </div>
+          </Toolbar> } >
+          <PageContent ref='menu' {...this.props} />
+        </Page>
+    );
   }
 };
 
@@ -339,12 +372,31 @@ class NewTask extends React.Component {
   }
 
   render() {
+
+    let actionButton, rightToolBarButton;
+
+    if (!ons.platform.isAndroid()) {
+      actionButton = <Button modifier="large" onClick={this.action}>
+        { this.props.editMode?
+          'Save Task' :
+            'Add New Task'
+        }
+      </Button>;
+    } else {
+      rightToolBarButton = <div className="right">
+          <ToolbarButton onClick={this.action}>
+            <Icon icon="md-save" />
+          </ToolbarButton>
+      </div>;
+    }
+
     return (
       <Page id="newTaskPage"
         renderToolbar={
           () => <Toolbar>
             <div className="left"><BackButton>Back</BackButton></div>
             <div className="center">{this.props.title}</div>
+            {rightToolBarButton}
           </Toolbar>
           }>
 
@@ -382,12 +434,7 @@ class NewTask extends React.Component {
                 </ListItem>
                 );
             }} />
-          <Button modifier="large" onClick={this.action}>
-            { this.props.editMode?
-              'Save Task' :
-                'Add New Task'
-            }
-              </Button>
+          {actionButton}
         </Page>
     );
   }
