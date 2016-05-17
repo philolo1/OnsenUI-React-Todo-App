@@ -43,7 +43,7 @@ class Menu extends React.Component {
               checked={ this.props.name === rowName }
             />
           </div>
-          <label className="center" for="r-all"> {rowName} </label>
+          <label className="center" htmlFor="r-all"> {rowName} </label>
         </ListItem>
       );
   }
@@ -62,7 +62,7 @@ class Menu extends React.Component {
               }
             />
           </div>
-          <label class="center" for="r-all">All</label>
+          <label class="center" htmlFor="r-all">All</label>
         </ListItem>
       );
     } else {
@@ -76,7 +76,7 @@ class Menu extends React.Component {
               }
             />
           </div>
-          <label className="center" for="r-no">No category</label>
+          <label className="center" htmlFor="r-no">No category</label>
         </ListItem>
       );
     }
