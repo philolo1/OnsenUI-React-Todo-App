@@ -284,7 +284,7 @@ class Content extends React.Component {
          <Icon icon={{default: 'ion-navicon', material:'md-menu'}} size={{default: 32, material:24}} />
        </ToolbarButton>
      </div>
-     <div className="center">To-Do List App 2.0</div>
+     <div className="center">React To-Do List App</div>
      <div className="right">
        <ons-if platform="ios other">
          <ToolbarButton onClick={this.props.onNewClick} component="button/new-task">New</ToolbarButton>
@@ -370,7 +370,6 @@ class NewTask extends React.Component {
                 <ListItem modifier="nodivider">
                   <div className='center'>
                     <Input
-                      id="category-input"
                       type="text"
                       value={this.state[data.fieldName]}
                       onChange={(event) => {

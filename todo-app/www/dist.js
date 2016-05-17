@@ -48881,747 +48881,6 @@ var _onsenui2 = _interopRequireDefault(_onsenui);
 
 var _reactOnsenui = require('react-onsenui');
 
-var _Menu = require('./Menu.js');
-
-var _Menu2 = _interopRequireDefault(_Menu);
-
-var _TaskCompleted = require('./TaskCompleted.js');
-
-var _TaskCompleted2 = _interopRequireDefault(_TaskCompleted);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Animator = {
-  remove: function remove(listItem, callback) {
-    listItem.classList.add('animation-remove');
-    listItem.classList.add('hide-children');
-
-    setTimeout(function () {
-      listItem.classList.remove('animation-remove');
-      listItem.classList.remove('hide-children');
-      callback();
-    }, 750);
-  },
-
-  swipe: function swipe(swipeRight, listItem, callback) {
-    var animation = swipeRight ? 'animation-swipe-right' : 'animation-swipe-left';
-    listItem.classList.add('hide-children');
-    listItem.classList.add(animation);
-
-    setTimeout(function () {
-      listItem.classList.remove(animation);
-      listItem.classList.remove('hide-children');
-      callback();
-    }, 950);
-  },
-
-  swipeRight: function swipeRight(listItem, callback) {
-    Animator.swipe(true, listItem, callback);
-  },
-
-  swipeLeft: function swipeLeft(listItem, callback) {
-    Animator.swipe(false, listItem, callback);
-  }
-
-};
-
-var TaskPending = function (_React$Component) {
-  _inherits(TaskPending, _React$Component);
-
-  function TaskPending(props) {
-    _classCallCheck(this, TaskPending);
-
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TaskPending).call(this, props));
-
-    _this.itemRef = {};
-    _this.renderTask = _this.renderTask.bind(_this);
-    _this.deleteItem = _this.deleteItem.bind(_this);
-    return _this;
-  }
-
-  _createClass(TaskPending, [{
-    key: 'checkItem',
-    value: function checkItem(name, row) {
-      var node = _reactDom2.default.findDOMNode(this.itemRef[name]);
-      this.props.onCompleteItem(node, row);
-    }
-  }, {
-    key: 'deleteItem',
-    value: function deleteItem(name, row) {
-      var node = _reactDom2.default.findDOMNode(this.itemRef[name]);
-      this.props.onDeleteItem(node, row);
-    }
-  }, {
-    key: 'renderTask',
-    value: function renderTask(row, index) {
-      var _this2 = this;
-
-      var refItem = 'item' + row.taskKey;
-      return _react2.default.createElement(
-        _reactOnsenui.ListItem,
-        {
-          ref: function ref(el) {
-            return _this2.itemRef[refItem] = el;
-          }, key: refItem, tappable: true, category: row.category },
-        _react2.default.createElement(
-          'label',
-          { className: 'left' },
-          _react2.default.createElement(_reactOnsenui.Input, { onClick: function onClick() {
-              return _this2.checkItem(refItem, row);
-            }, type: 'checkbox' })
-        ),
-        _react2.default.createElement(
-          'div',
-          { className: 'center',
-            onClick: function onClick() {
-              return _this2.props.onItemClick(row);
-            } },
-          row.title
-        ),
-        _react2.default.createElement(
-          'div',
-          { className: 'right' },
-          _react2.default.createElement(_reactOnsenui.Icon, { onClick: function onClick() {
-              return _this2.deleteItem(refItem, row);
-            }, style: { color: 'grey', paddingLeft: '4px' }, icon: { default: 'ion-ios-trash-outline', material: 'md-delete' } })
-        )
-      );
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      return _react2.default.createElement(
-        _reactOnsenui.Page,
-        null,
-        _react2.default.createElement(_reactOnsenui.List, {
-          dataSource: this.props.tasks,
-          renderRow: this.renderTask })
-      );
-    }
-  }]);
-
-  return TaskPending;
-}(_react2.default.Component);
-
-;
-
-var PageContent = function (_React$Component2) {
-  _inherits(PageContent, _React$Component2);
-
-  function PageContent(props) {
-    _classCallCheck(this, PageContent);
-
-    var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(PageContent).call(this, props));
-
-    _this3.state = {};
-    return _this3;
-  }
-
-  _createClass(PageContent, [{
-    key: 'render',
-    value: function render() {
-      var _this4 = this;
-
-      return _react2.default.createElement(_reactOnsenui.Tabbar, {
-        position: 'bottom',
-        renderTabs: function renderTabs(activeIndex, tabbar) {
-          return [{
-            content: _react2.default.createElement(TaskPending, _extends({}, _this4.props, { tasks: _this4.props.unCompletedTasks })),
-            tab: _react2.default.createElement(_reactOnsenui.Tab, { label: 'Pending' })
-          }, {
-            content: _react2.default.createElement(_TaskCompleted2.default, _extends({}, _this4.props, { tasks: _this4.props.completedTasks })),
-            tab: _react2.default.createElement(_reactOnsenui.Tab, { label: 'Completed' })
-          }];
-        } });
-    }
-  }]);
-
-  return PageContent;
-}(_react2.default.Component);
-
-;
-
-var Content = function (_React$Component3) {
-  _inherits(Content, _React$Component3);
-
-  function Content(props) {
-    _classCallCheck(this, Content);
-
-    var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(Content).call(this, props));
-
-    _this5.state = {};
-    _this5.openMenu = _this5.openMenu.bind(_this5);
-    return _this5;
-  }
-
-  _createClass(Content, [{
-    key: 'openMenu',
-    value: function openMenu() {
-      this.props.onMenuClick();
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      var _this6 = this;
-
-      return _react2.default.createElement(
-        _reactOnsenui.Page,
-        {
-          id: 'tabbarPage',
-          renderToolbar: function renderToolbar() {
-            return _react2.default.createElement(
-              _reactOnsenui.Toolbar,
-              null,
-              _react2.default.createElement(
-                'div',
-                { className: 'left' },
-                _react2.default.createElement(
-                  _reactOnsenui.ToolbarButton,
-                  { component: 'button/menu', onClick: _this6.openMenu },
-                  _react2.default.createElement(_reactOnsenui.Icon, { icon: { default: 'ion-navicon', material: 'md-menu' }, size: { default: 32, material: 24 } })
-                )
-              ),
-              _react2.default.createElement(
-                'div',
-                { className: 'center' },
-                'To-Do List App 2.0'
-              ),
-              _react2.default.createElement(
-                'div',
-                { className: 'right' },
-                _react2.default.createElement(
-                  'ons-if',
-                  { platform: 'ios other' },
-                  _react2.default.createElement(
-                    _reactOnsenui.ToolbarButton,
-                    { onClick: _this6.props.onNewClick, component: 'button/new-task' },
-                    'New'
-                  )
-                )
-              )
-            );
-          } },
-        _react2.default.createElement(PageContent, _extends({ ref: 'menu' }, this.props))
-      );
-    }
-  }]);
-
-  return Content;
-}(_react2.default.Component);
-
-;
-
-var NewTask = function (_React$Component4) {
-  _inherits(NewTask, _React$Component4);
-
-  function NewTask(props) {
-    _classCallCheck(this, NewTask);
-
-    var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(NewTask).call(this, props));
-
-    _this7.action = _this7.action.bind(_this7);
-
-    var _this7$props$taskData = _this7.props.taskData;
-    var title = _this7$props$taskData.title;
-    var category = _this7$props$taskData.category;
-    var description = _this7$props$taskData.description;
-
-
-    _this7.state = {
-      urgent: false,
-      title: title,
-      category: category,
-      description: description
-    };
-    return _this7;
-  }
-
-  _createClass(NewTask, [{
-    key: 'action',
-    value: function action() {
-
-      if (!this.state.title || this.state.title.length == 0) {
-        _onsenui2.default.notification.alert('You must provide a task title.');
-        return;
-      }
-
-      if (this.props.editMode) {
-        this.props.prevPage.editTask(this.props.taskData.taskKey, this.state.title, this.state.category, this.state.description);
-      } else {
-        this.props.prevPage.addTask(this.state.title, this.state.category, this.state.description);
-      }
-
-      this.props.navigator.popPage();
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      var _this8 = this;
-
-      return _react2.default.createElement(
-        _reactOnsenui.Page,
-        { id: 'newTaskPage',
-          renderToolbar: function renderToolbar() {
-            return _react2.default.createElement(
-              _reactOnsenui.Toolbar,
-              null,
-              _react2.default.createElement(
-                'div',
-                { className: 'left' },
-                _react2.default.createElement(
-                  _reactOnsenui.BackButton,
-                  null,
-                  'Back'
-                )
-              ),
-              _react2.default.createElement(
-                'div',
-                { className: 'center' },
-                _this8.props.title
-              )
-            );
-          } },
-        _react2.default.createElement(_reactOnsenui.List, {
-          renderHeader: function renderHeader() {
-            return _react2.default.createElement(
-              _reactOnsenui.ListHeader,
-              null,
-              ' Add a new task '
-            );
-          },
-          dataSource: [{
-            placeholder: 'I want to',
-            fieldName: 'title'
-          }, {
-            placeholder: 'Category',
-            fieldName: 'category'
-          }, {
-            placeholder: 'Description',
-            fieldName: 'description'
-          }],
-          renderRow: function renderRow(data) {
-            return _react2.default.createElement(
-              _reactOnsenui.ListItem,
-              { modifier: 'nodivider' },
-              _react2.default.createElement(
-                'div',
-                { className: 'center' },
-                _react2.default.createElement(_reactOnsenui.Input, {
-                  id: 'category-input',
-                  type: 'text',
-                  value: _this8.state[data.fieldName],
-                  onChange: function onChange(event) {
-                    var newData = {};
-                    newData[data.fieldName] = event.target.value;
-                    _this8.setState(newData);
-                  },
-                  placeholder: data.placeholder, float: true })
-              )
-            );
-          } }),
-        _react2.default.createElement(
-          _reactOnsenui.Button,
-          { modifier: 'large', onClick: this.action },
-          this.props.editMode ? 'Save Task' : 'Add New Task'
-        )
-      );
-    }
-  }]);
-
-  return NewTask;
-}(_react2.default.Component);
-
-;
-
-NewTask.defaultProps = {
-  taskData: {}
-};
-
-var FirstPage = function (_React$Component5) {
-  _inherits(FirstPage, _React$Component5);
-
-  function FirstPage(props) {
-    _classCallCheck(this, FirstPage);
-
-    var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(FirstPage).call(this, props));
-
-    _this9.counter = 7;
-    _this9.deleteItem = _this9.deleteItem.bind(_this9);
-    _this9.newClick = _this9.newClick.bind(_this9);
-    _this9.completeItem = _this9.completeItem.bind(_this9);
-    _this9.getCategories = _this9.getCategories.bind(_this9);
-    _this9.itemClick = _this9.itemClick.bind(_this9);
-    _this9.unCompleteItem = _this9.unCompleteItem.bind(_this9);
-    _this9.changeMenuItem = _this9.changeMenuItem.bind(_this9);
-    _this9.filter = _this9.filter.bind(_this9);
-    _this9.addTask = _this9.addTask.bind(_this9);
-    _this9.editTask = _this9.editTask.bind(_this9);
-    _this9.state = {
-      filter: {
-        mode: 'default',
-        name: 'All',
-        func: function func() {
-          return true;
-        }
-      },
-      unCompletedTasks: [{
-        title: 'Download OnsenUI',
-        category: 'Programming',
-        description: 'Some description.',
-        highlight: false,
-        urgent: false,
-        taskKey: 0
-      }, {
-        title: 'Install Monaca CLI',
-        category: 'Programming',
-        description: 'Some description.',
-        highlight: false,
-        urgent: false,
-        taskKey: 1
-      }, {
-        title: 'Star Onsen UI repo on Github',
-        category: 'Super important',
-        description: 'Some description.',
-        highlight: false,
-        urgent: false,
-        taskKey: 2
-      }, {
-        title: 'Register in the community forum',
-        category: 'Super important',
-        description: 'Some description.',
-        highlight: false,
-        urgent: false,
-        taskKey: 3
-      }, {
-        title: 'Send donations to Fran and Andreas',
-        category: 'Super important',
-        description: 'Some description.',
-        highlight: false,
-        urgent: false,
-        taskKey: 4
-      }, {
-        title: 'Profit',
-        description: 'Some description.',
-        highlight: false,
-        urgent: false,
-        taskKey: 5
-      }, {
-        title: 'Visit Japan',
-        category: 'Travels',
-        description: 'Some description.',
-        highlight: false,
-        urgent: false,
-        taskKey: 6
-      }, {
-        title: 'Enjoy an Onsen with Onsen UI team',
-        category: 'Personal',
-        description: 'Some description.',
-        highlight: false,
-        urgent: false,
-        taskKey: 7
-      }],
-      completedTasks: []
-    };
-    return _this9;
-  }
-
-  _createClass(FirstPage, [{
-    key: 'itemClick',
-    value: function itemClick(rowData) {
-      this.props.navigator.pushPage({
-        prevPage: this,
-        component: NewTask,
-        title: 'Task Details',
-        editMode: true,
-        taskData: rowData
-      }, { animation: 'lift' });
-    }
-  }, {
-    key: 'updateArr',
-    value: function updateArr(tasks, taskKey, title, category, description) {
-      return tasks.map(function (el) {
-        if (el.taskKey != taskKey) return el;
-        return {
-          title: title,
-          category: category,
-          description: description,
-          taskKey: taskKey
-        };
-      });
-    }
-  }, {
-    key: 'editTask',
-    value: function editTask(taskKey, title, category, description) {
-      var tasks = this.state.unCompletedTasks.slice();
-      var tasks2 = this.state.completedTasks.slice();
-
-      tasks = this.updateArr(tasks, taskKey, title, category, description);
-      tasks2 = this.updateArr(tasks2, taskKey, title, category, description);
-
-      this.setState({
-        unCompletedTasks: tasks,
-        completedTasks: tasks2
-      });
-    }
-  }, {
-    key: 'addTask',
-    value: function addTask(title, category, description) {
-      var tasks = this.state.unCompletedTasks.slice();
-      this.counter++;
-      tasks.push({
-        title: title,
-        category: category,
-        description: description,
-        taskKey: this.counter
-      });
-
-      this.setState({
-        unCompletedTasks: tasks
-      });
-    }
-  }, {
-    key: 'filter',
-    value: function filter(arr) {
-      return arr.filter(this.state.filter.func);
-    }
-  }, {
-    key: 'getCategories',
-    value: function getCategories() {
-      var tasks = this.state.unCompletedTasks.concat(this.state.completedTasks);
-      tasks = tasks.map(function (el) {
-        return el.category;
-      }).filter(function (el) {
-        return el != null;
-      });
-      if (this.state.filter.mode == 'custom') {
-        tasks.push(this.state.filter.name);
-      }
-      tasks = _underscore2.default.uniq(tasks);
-      return tasks;
-    }
-  }, {
-    key: 'changeMenuItem',
-    value: function changeMenuItem(data) {
-      var fun = void 0;
-
-      if (data.mode == 'default') {
-        if (data.name == 'All') {
-          fun = function fun() {
-            return true;
-          };
-        } else {
-          fun = function fun(el) {
-            return el.category == null;
-          };
-        }
-      } else {
-        fun = function fun(el) {
-          return el.category == data.name;
-        };
-      }
-
-      var filterData = {
-        name: data.name,
-        mode: data.mode,
-        func: fun
-      };
-
-      this.setState({
-        filter: filterData
-      });
-    }
-  }, {
-    key: 'deleteItem',
-    value: function deleteItem(node, rowData) {
-      var _this10 = this;
-
-      node.classList.add('animation-remove');
-      node.classList.add('hide-children');
-
-      setTimeout(function () {
-        node.classList.remove('animation-remove');
-        node.classList.remove('hide-children');
-
-        var arr1 = _this10.state.completedTasks.filter(function (el) {
-          return el.taskKey !== rowData.taskKey;
-        });
-
-        var arr2 = _this10.state.unCompletedTasks.filter(function (el) {
-          return el.taskKey !== rowData.taskKey;
-        });
-
-        _this10.setState({
-          completedTasks: arr1,
-          unCompletedTasks: arr2
-        });
-      }, 750);
-    }
-  }, {
-    key: 'completeItem',
-    value: function completeItem(node, rowData) {
-      var _this11 = this;
-
-      var animation = 'animation-swipe-right';
-      node.classList.add('hide-children');
-      node.classList.add(animation);
-
-      setTimeout(function () {
-        node.classList.remove(animation);
-        node.classList.remove('hide-children');
-
-        var arr1 = _this11.state.unCompletedTasks.filter(function (el) {
-          return el.taskKey !== rowData.taskKey;
-        });
-        var arr2 = _this11.state.completedTasks.slice();
-        arr2.push(rowData);
-
-        _this11.setState({
-          unCompletedTasks: arr1,
-          completedTasks: arr2
-
-        });
-      }, 950);
-    }
-  }, {
-    key: 'unCompleteItem',
-    value: function unCompleteItem(node, rowData) {
-      var _this12 = this;
-
-      var animation = 'animation-swipe-left';
-      node.classList.add('hide-children');
-      node.classList.add(animation);
-
-      setTimeout(function () {
-        node.classList.remove(animation);
-        node.classList.remove('hide-children');
-
-        var arr1 = _this12.state.completedTasks.filter(function (el) {
-          return el.taskKey !== rowData.taskKey;
-        });
-        var arr2 = _this12.state.unCompletedTasks.slice();
-        arr2.push(rowData);
-
-        _this12.setState({
-          completedTasks: arr1,
-          unCompletedTasks: arr2
-        });
-      }, 950);
-    }
-  }, {
-    key: 'newClick',
-    value: function newClick() {
-      var navigator = this.props.navigator;
-      this.props.navigator.pushPage({
-        prevPage: this,
-        component: NewTask,
-        title: 'New Task'
-      });
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      var _this13 = this;
-
-      return _react2.default.createElement(
-        _reactOnsenui.Page,
-        null,
-        _react2.default.createElement(
-          _reactOnsenui.Splitter,
-          { ref: 'splitter', id: 'mySplitter' },
-          _react2.default.createElement(
-            _reactOnsenui.SplitterSide,
-            {
-              onOpen: function onOpen() {
-                return _this13.setState({ menuOpen: true });
-              },
-              onClose: function onClose() {
-                return _this13.setState({ menuOpen: false });
-              },
-              isOpen: this.state.menuOpen, isSwipeable: true, width: '250px', isCollapsed: true, swipeTargetWidth: 50 },
-            _react2.default.createElement(_Menu2.default, _extends({ categories: this.getCategories() }, this.state.filter, {
-              onClickMenuItem: this.changeMenuItem
-            }))
-          ),
-          _react2.default.createElement(
-            _reactOnsenui.SplitterContent,
-            null,
-            _react2.default.createElement(Content, {
-              onItemClick: this.itemClick,
-              onNewClick: this.newClick,
-              onMenuClick: function onMenuClick() {
-                return _this13.setState({ menuOpen: true });
-              },
-              unCompletedTasks: this.filter(this.state.unCompletedTasks),
-              completedTasks: this.filter(this.state.completedTasks),
-              onUnCompleteItem: this.unCompleteItem,
-              onCompleteItem: this.completeItem,
-              onDeleteItem: this.deleteItem })
-          )
-        )
-      );
-    }
-  }]);
-
-  return FirstPage;
-}(_react2.default.Component);
-
-;
-
-var App = function App(props) {
-  return _react2.default.createElement(_reactOnsenui.Navigator, {
-    initialRoute: {
-      component: FirstPage
-    },
-    renderPage: function renderPage(route, navigator) {
-      return _react2.default.createElement(route.component, {
-        prevPage: route.prevPage,
-        navigator: navigator,
-        title: route.title,
-        taskData: route.taskData,
-        editMode: route.editMode
-      });
-    } });
-};
-
-App.propTypes = {
-  children: _react.PropTypes.element
-};
-
-exports.default = App;
-
-},{"./Menu.js":172,"./TaskCompleted.js":173,"onsenui":29,"react":169,"react-dom":30,"react-onsenui":31,"underscore":170}],172:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactDom = require('react-dom');
-
-var _reactDom2 = _interopRequireDefault(_reactDom);
-
-var _underscore = require('underscore');
-
-var _underscore2 = _interopRequireDefault(_underscore);
-
-var _onsenui = require('onsenui');
-
-var _onsenui2 = _interopRequireDefault(_onsenui);
-
-var _reactOnsenui = require('react-onsenui');
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -49758,56 +49017,20 @@ var Menu = function (_React$Component) {
   return Menu;
 }(_react2.default.Component);
 
-exports.default = Menu;
 ;
 
-},{"onsenui":29,"react":169,"react-dom":30,"react-onsenui":31,"underscore":170}],173:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactDom = require('react-dom');
-
-var _reactDom2 = _interopRequireDefault(_reactDom);
-
-var _underscore = require('underscore');
-
-var _underscore2 = _interopRequireDefault(_underscore);
-
-var _onsenui = require('onsenui');
-
-var _onsenui2 = _interopRequireDefault(_onsenui);
-
-var _reactOnsenui = require('react-onsenui');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var TaskCompleted = function (_React$Component) {
-  _inherits(TaskCompleted, _React$Component);
+var TaskCompleted = function (_React$Component2) {
+  _inherits(TaskCompleted, _React$Component2);
 
   function TaskCompleted(props) {
     _classCallCheck(this, TaskCompleted);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TaskCompleted).call(this, props));
+    var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(TaskCompleted).call(this, props));
 
-    _this.itemRef = {};
-    _this.renderTask = _this.renderTask.bind(_this);
-    _this.deleteItem = _this.deleteItem.bind(_this);
-    return _this;
+    _this4.itemRef = {};
+    _this4.renderTask = _this4.renderTask.bind(_this4);
+    _this4.deleteItem = _this4.deleteItem.bind(_this4);
+    return _this4;
   }
 
   _createClass(TaskCompleted, [{
@@ -49825,14 +49048,14 @@ var TaskCompleted = function (_React$Component) {
   }, {
     key: 'renderTask',
     value: function renderTask(row, index) {
-      var _this2 = this;
+      var _this5 = this;
 
       var refItem = 'item' + row.taskKey;
       return _react2.default.createElement(
         _reactOnsenui.ListItem,
         {
           ref: function ref(el) {
-            return _this2.itemRef[refItem] = el;
+            return _this5.itemRef[refItem] = el;
           },
           key: refItem,
           tappable: true,
@@ -49842,14 +49065,14 @@ var TaskCompleted = function (_React$Component) {
           { className: 'left'
           },
           _react2.default.createElement(_reactOnsenui.Input, { checked: true, onClick: function onClick() {
-              return _this2.checkItem(refItem, row);
+              return _this5.checkItem(refItem, row);
             }, type: 'checkbox' })
         ),
         _react2.default.createElement(
           'div',
           { className: 'center',
             onClick: function onClick() {
-              return _this2.props.onItemClick(row);
+              return _this5.props.onItemClick(row);
             } },
           row.title
         ),
@@ -49857,7 +49080,7 @@ var TaskCompleted = function (_React$Component) {
           'div',
           { className: 'right' },
           _react2.default.createElement(_reactOnsenui.Icon, { onClick: function onClick() {
-              return _this2.deleteItem(refItem, row);
+              return _this5.deleteItem(refItem, row);
             }, style: { color: 'grey', paddingLeft: '4px' }, icon: { default: 'ion-ios-trash-outline', material: 'md-delete' } })
         )
       );
@@ -49878,10 +49101,706 @@ var TaskCompleted = function (_React$Component) {
   return TaskCompleted;
 }(_react2.default.Component);
 
-exports.default = TaskCompleted;
 ;
 
-},{"onsenui":29,"react":169,"react-dom":30,"react-onsenui":31,"underscore":170}],174:[function(require,module,exports){
+var Animator = {
+  remove: function remove(listItem, callback) {
+    listItem.classList.add('animation-remove');
+    listItem.classList.add('hide-children');
+
+    setTimeout(function () {
+      listItem.classList.remove('animation-remove');
+      listItem.classList.remove('hide-children');
+      callback();
+    }, 750);
+  },
+
+  swipe: function swipe(swipeRight, listItem, callback) {
+    var animation = swipeRight ? 'animation-swipe-right' : 'animation-swipe-left';
+    listItem.classList.add('hide-children');
+    listItem.classList.add(animation);
+
+    setTimeout(function () {
+      listItem.classList.remove(animation);
+      listItem.classList.remove('hide-children');
+      callback();
+    }, 950);
+  },
+
+  swipeRight: function swipeRight(listItem, callback) {
+    Animator.swipe(true, listItem, callback);
+  },
+
+  swipeLeft: function swipeLeft(listItem, callback) {
+    Animator.swipe(false, listItem, callback);
+  }
+
+};
+
+var TaskPending = function (_React$Component3) {
+  _inherits(TaskPending, _React$Component3);
+
+  function TaskPending(props) {
+    _classCallCheck(this, TaskPending);
+
+    var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(TaskPending).call(this, props));
+
+    _this6.itemRef = {};
+    _this6.renderTask = _this6.renderTask.bind(_this6);
+    _this6.deleteItem = _this6.deleteItem.bind(_this6);
+    return _this6;
+  }
+
+  _createClass(TaskPending, [{
+    key: 'checkItem',
+    value: function checkItem(name, row) {
+      var node = _reactDom2.default.findDOMNode(this.itemRef[name]);
+      this.props.onCompleteItem(node, row);
+    }
+  }, {
+    key: 'deleteItem',
+    value: function deleteItem(name, row) {
+      var node = _reactDom2.default.findDOMNode(this.itemRef[name]);
+      this.props.onDeleteItem(node, row);
+    }
+  }, {
+    key: 'renderTask',
+    value: function renderTask(row, index) {
+      var _this7 = this;
+
+      var refItem = 'item' + row.taskKey;
+      return _react2.default.createElement(
+        _reactOnsenui.ListItem,
+        {
+          ref: function ref(el) {
+            return _this7.itemRef[refItem] = el;
+          }, key: refItem, tappable: true, category: row.category },
+        _react2.default.createElement(
+          'label',
+          { className: 'left' },
+          _react2.default.createElement(_reactOnsenui.Input, { onClick: function onClick() {
+              return _this7.checkItem(refItem, row);
+            }, type: 'checkbox' })
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'center',
+            onClick: function onClick() {
+              return _this7.props.onItemClick(row);
+            } },
+          row.title
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'right' },
+          _react2.default.createElement(_reactOnsenui.Icon, { onClick: function onClick() {
+              return _this7.deleteItem(refItem, row);
+            }, style: { color: 'grey', paddingLeft: '4px' }, icon: { default: 'ion-ios-trash-outline', material: 'md-delete' } })
+        )
+      );
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        _reactOnsenui.Page,
+        null,
+        _react2.default.createElement(_reactOnsenui.List, {
+          dataSource: this.props.tasks,
+          renderRow: this.renderTask })
+      );
+    }
+  }]);
+
+  return TaskPending;
+}(_react2.default.Component);
+
+;
+
+var PageContent = function (_React$Component4) {
+  _inherits(PageContent, _React$Component4);
+
+  function PageContent(props) {
+    _classCallCheck(this, PageContent);
+
+    var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(PageContent).call(this, props));
+
+    _this8.state = {};
+    return _this8;
+  }
+
+  _createClass(PageContent, [{
+    key: 'render',
+    value: function render() {
+      var _this9 = this;
+
+      return _react2.default.createElement(_reactOnsenui.Tabbar, {
+        position: 'bottom',
+        renderTabs: function renderTabs(activeIndex, tabbar) {
+          return [{
+            content: _react2.default.createElement(TaskPending, _extends({}, _this9.props, { tasks: _this9.props.unCompletedTasks })),
+            tab: _react2.default.createElement(_reactOnsenui.Tab, { label: 'Pending' })
+          }, {
+            content: _react2.default.createElement(TaskCompleted, _extends({}, _this9.props, { tasks: _this9.props.completedTasks })),
+            tab: _react2.default.createElement(_reactOnsenui.Tab, { label: 'Completed' })
+          }];
+        } });
+    }
+  }]);
+
+  return PageContent;
+}(_react2.default.Component);
+
+;
+
+var Content = function (_React$Component5) {
+  _inherits(Content, _React$Component5);
+
+  function Content(props) {
+    _classCallCheck(this, Content);
+
+    var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(Content).call(this, props));
+
+    _this10.state = {};
+    _this10.openMenu = _this10.openMenu.bind(_this10);
+    return _this10;
+  }
+
+  _createClass(Content, [{
+    key: 'openMenu',
+    value: function openMenu() {
+      this.props.onMenuClick();
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this11 = this;
+
+      return _react2.default.createElement(
+        _reactOnsenui.Page,
+        {
+          id: 'tabbarPage',
+          renderToolbar: function renderToolbar() {
+            return _react2.default.createElement(
+              _reactOnsenui.Toolbar,
+              null,
+              _react2.default.createElement(
+                'div',
+                { className: 'left' },
+                _react2.default.createElement(
+                  _reactOnsenui.ToolbarButton,
+                  { component: 'button/menu', onClick: _this11.openMenu },
+                  _react2.default.createElement(_reactOnsenui.Icon, { icon: { default: 'ion-navicon', material: 'md-menu' }, size: { default: 32, material: 24 } })
+                )
+              ),
+              _react2.default.createElement(
+                'div',
+                { className: 'center' },
+                'React To-Do List App'
+              ),
+              _react2.default.createElement(
+                'div',
+                { className: 'right' },
+                _react2.default.createElement(
+                  'ons-if',
+                  { platform: 'ios other' },
+                  _react2.default.createElement(
+                    _reactOnsenui.ToolbarButton,
+                    { onClick: _this11.props.onNewClick, component: 'button/new-task' },
+                    'New'
+                  )
+                )
+              )
+            );
+          } },
+        _react2.default.createElement(PageContent, _extends({ ref: 'menu' }, this.props))
+      );
+    }
+  }]);
+
+  return Content;
+}(_react2.default.Component);
+
+;
+
+var NewTask = function (_React$Component6) {
+  _inherits(NewTask, _React$Component6);
+
+  function NewTask(props) {
+    _classCallCheck(this, NewTask);
+
+    var _this12 = _possibleConstructorReturn(this, Object.getPrototypeOf(NewTask).call(this, props));
+
+    _this12.action = _this12.action.bind(_this12);
+
+    var _this12$props$taskDat = _this12.props.taskData;
+    var title = _this12$props$taskDat.title;
+    var category = _this12$props$taskDat.category;
+    var description = _this12$props$taskDat.description;
+
+
+    _this12.state = {
+      urgent: false,
+      title: title,
+      category: category,
+      description: description
+    };
+    return _this12;
+  }
+
+  _createClass(NewTask, [{
+    key: 'action',
+    value: function action() {
+
+      if (!this.state.title || this.state.title.length == 0) {
+        _onsenui2.default.notification.alert('You must provide a task title.');
+        return;
+      }
+
+      if (this.props.editMode) {
+        this.props.prevPage.editTask(this.props.taskData.taskKey, this.state.title, this.state.category, this.state.description);
+      } else {
+        this.props.prevPage.addTask(this.state.title, this.state.category, this.state.description);
+      }
+
+      this.props.navigator.popPage();
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this13 = this;
+
+      return _react2.default.createElement(
+        _reactOnsenui.Page,
+        { id: 'newTaskPage',
+          renderToolbar: function renderToolbar() {
+            return _react2.default.createElement(
+              _reactOnsenui.Toolbar,
+              null,
+              _react2.default.createElement(
+                'div',
+                { className: 'left' },
+                _react2.default.createElement(
+                  _reactOnsenui.BackButton,
+                  null,
+                  'Back'
+                )
+              ),
+              _react2.default.createElement(
+                'div',
+                { className: 'center' },
+                _this13.props.title
+              )
+            );
+          } },
+        _react2.default.createElement(_reactOnsenui.List, {
+          renderHeader: function renderHeader() {
+            return _react2.default.createElement(
+              _reactOnsenui.ListHeader,
+              null,
+              ' Add a new task '
+            );
+          },
+          dataSource: [{
+            placeholder: 'I want to',
+            fieldName: 'title'
+          }, {
+            placeholder: 'Category',
+            fieldName: 'category'
+          }, {
+            placeholder: 'Description',
+            fieldName: 'description'
+          }],
+          renderRow: function renderRow(data) {
+            return _react2.default.createElement(
+              _reactOnsenui.ListItem,
+              { modifier: 'nodivider' },
+              _react2.default.createElement(
+                'div',
+                { className: 'center' },
+                _react2.default.createElement(_reactOnsenui.Input, {
+                  type: 'text',
+                  value: _this13.state[data.fieldName],
+                  onChange: function onChange(event) {
+                    var newData = {};
+                    newData[data.fieldName] = event.target.value;
+                    _this13.setState(newData);
+                  },
+                  placeholder: data.placeholder, float: true })
+              )
+            );
+          } }),
+        _react2.default.createElement(
+          _reactOnsenui.Button,
+          { modifier: 'large', onClick: this.action },
+          this.props.editMode ? 'Save Task' : 'Add New Task'
+        )
+      );
+    }
+  }]);
+
+  return NewTask;
+}(_react2.default.Component);
+
+;
+
+NewTask.defaultProps = {
+  taskData: {}
+};
+
+var FirstPage = function (_React$Component7) {
+  _inherits(FirstPage, _React$Component7);
+
+  function FirstPage(props) {
+    _classCallCheck(this, FirstPage);
+
+    var _this14 = _possibleConstructorReturn(this, Object.getPrototypeOf(FirstPage).call(this, props));
+
+    _this14.counter = 7;
+    _this14.deleteItem = _this14.deleteItem.bind(_this14);
+    _this14.newClick = _this14.newClick.bind(_this14);
+    _this14.completeItem = _this14.completeItem.bind(_this14);
+    _this14.getCategories = _this14.getCategories.bind(_this14);
+    _this14.itemClick = _this14.itemClick.bind(_this14);
+    _this14.unCompleteItem = _this14.unCompleteItem.bind(_this14);
+    _this14.changeMenuItem = _this14.changeMenuItem.bind(_this14);
+    _this14.filter = _this14.filter.bind(_this14);
+    _this14.addTask = _this14.addTask.bind(_this14);
+    _this14.editTask = _this14.editTask.bind(_this14);
+    _this14.state = {
+      filter: {
+        mode: 'default',
+        name: 'All',
+        func: function func() {
+          return true;
+        }
+      },
+      unCompletedTasks: [{
+        title: 'Download OnsenUI',
+        category: 'Programming',
+        description: 'Some description.',
+        highlight: false,
+        urgent: false,
+        taskKey: 0
+      }, {
+        title: 'Install Monaca CLI',
+        category: 'Programming',
+        description: 'Some description.',
+        highlight: false,
+        urgent: false,
+        taskKey: 1
+      }, {
+        title: 'Star Onsen UI repo on Github',
+        category: 'Super important',
+        description: 'Some description.',
+        highlight: false,
+        urgent: false,
+        taskKey: 2
+      }, {
+        title: 'Register in the community forum',
+        category: 'Super important',
+        description: 'Some description.',
+        highlight: false,
+        urgent: false,
+        taskKey: 3
+      }, {
+        title: 'Send donations to Fran and Andreas',
+        category: 'Super important',
+        description: 'Some description.',
+        highlight: false,
+        urgent: false,
+        taskKey: 4
+      }, {
+        title: 'Profit',
+        description: 'Some description.',
+        highlight: false,
+        urgent: false,
+        taskKey: 5
+      }, {
+        title: 'Visit Japan',
+        category: 'Travels',
+        description: 'Some description.',
+        highlight: false,
+        urgent: false,
+        taskKey: 6
+      }, {
+        title: 'Enjoy an Onsen with Onsen UI team',
+        category: 'Personal',
+        description: 'Some description.',
+        highlight: false,
+        urgent: false,
+        taskKey: 7
+      }],
+      completedTasks: []
+    };
+    return _this14;
+  }
+
+  _createClass(FirstPage, [{
+    key: 'itemClick',
+    value: function itemClick(rowData) {
+      this.props.navigator.pushPage({
+        prevPage: this,
+        component: NewTask,
+        title: 'Task Details',
+        editMode: true,
+        taskData: rowData
+      }, { animation: 'lift' });
+    }
+  }, {
+    key: 'updateArr',
+    value: function updateArr(tasks, taskKey, title, category, description) {
+      return tasks.map(function (el) {
+        if (el.taskKey != taskKey) return el;
+        return {
+          title: title,
+          category: category,
+          description: description,
+          taskKey: taskKey
+        };
+      });
+    }
+  }, {
+    key: 'editTask',
+    value: function editTask(taskKey, title, category, description) {
+      var tasks = this.state.unCompletedTasks.slice();
+      var tasks2 = this.state.completedTasks.slice();
+
+      tasks = this.updateArr(tasks, taskKey, title, category, description);
+      tasks2 = this.updateArr(tasks2, taskKey, title, category, description);
+
+      this.setState({
+        unCompletedTasks: tasks,
+        completedTasks: tasks2
+      });
+    }
+  }, {
+    key: 'addTask',
+    value: function addTask(title, category, description) {
+      var tasks = this.state.unCompletedTasks.slice();
+      this.counter++;
+      tasks.push({
+        title: title,
+        category: category,
+        description: description,
+        taskKey: this.counter
+      });
+
+      this.setState({
+        unCompletedTasks: tasks
+      });
+    }
+  }, {
+    key: 'filter',
+    value: function filter(arr) {
+      return arr.filter(this.state.filter.func);
+    }
+  }, {
+    key: 'getCategories',
+    value: function getCategories() {
+      var tasks = this.state.unCompletedTasks.concat(this.state.completedTasks);
+      tasks = tasks.map(function (el) {
+        return el.category;
+      }).filter(function (el) {
+        return el != null;
+      });
+      if (this.state.filter.mode == 'custom') {
+        tasks.push(this.state.filter.name);
+      }
+      tasks = _underscore2.default.uniq(tasks);
+      return tasks;
+    }
+  }, {
+    key: 'changeMenuItem',
+    value: function changeMenuItem(data) {
+      var fun = void 0;
+
+      if (data.mode == 'default') {
+        if (data.name == 'All') {
+          fun = function fun() {
+            return true;
+          };
+        } else {
+          fun = function fun(el) {
+            return el.category == null;
+          };
+        }
+      } else {
+        fun = function fun(el) {
+          return el.category == data.name;
+        };
+      }
+
+      var filterData = {
+        name: data.name,
+        mode: data.mode,
+        func: fun
+      };
+
+      this.setState({
+        filter: filterData
+      });
+    }
+  }, {
+    key: 'deleteItem',
+    value: function deleteItem(node, rowData) {
+      var _this15 = this;
+
+      node.classList.add('animation-remove');
+      node.classList.add('hide-children');
+
+      setTimeout(function () {
+        node.classList.remove('animation-remove');
+        node.classList.remove('hide-children');
+
+        var arr1 = _this15.state.completedTasks.filter(function (el) {
+          return el.taskKey !== rowData.taskKey;
+        });
+
+        var arr2 = _this15.state.unCompletedTasks.filter(function (el) {
+          return el.taskKey !== rowData.taskKey;
+        });
+
+        _this15.setState({
+          completedTasks: arr1,
+          unCompletedTasks: arr2
+        });
+      }, 750);
+    }
+  }, {
+    key: 'completeItem',
+    value: function completeItem(node, rowData) {
+      var _this16 = this;
+
+      var animation = 'animation-swipe-right';
+      node.classList.add('hide-children');
+      node.classList.add(animation);
+
+      setTimeout(function () {
+        node.classList.remove(animation);
+        node.classList.remove('hide-children');
+
+        var arr1 = _this16.state.unCompletedTasks.filter(function (el) {
+          return el.taskKey !== rowData.taskKey;
+        });
+        var arr2 = _this16.state.completedTasks.slice();
+        arr2.push(rowData);
+
+        _this16.setState({
+          unCompletedTasks: arr1,
+          completedTasks: arr2
+
+        });
+      }, 950);
+    }
+  }, {
+    key: 'unCompleteItem',
+    value: function unCompleteItem(node, rowData) {
+      var _this17 = this;
+
+      var animation = 'animation-swipe-left';
+      node.classList.add('hide-children');
+      node.classList.add(animation);
+
+      setTimeout(function () {
+        node.classList.remove(animation);
+        node.classList.remove('hide-children');
+
+        var arr1 = _this17.state.completedTasks.filter(function (el) {
+          return el.taskKey !== rowData.taskKey;
+        });
+        var arr2 = _this17.state.unCompletedTasks.slice();
+        arr2.push(rowData);
+
+        _this17.setState({
+          completedTasks: arr1,
+          unCompletedTasks: arr2
+        });
+      }, 950);
+    }
+  }, {
+    key: 'newClick',
+    value: function newClick() {
+      var navigator = this.props.navigator;
+      this.props.navigator.pushPage({
+        prevPage: this,
+        component: NewTask,
+        title: 'New Task'
+      });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this18 = this;
+
+      return _react2.default.createElement(
+        _reactOnsenui.Page,
+        null,
+        _react2.default.createElement(
+          _reactOnsenui.Splitter,
+          { ref: 'splitter', id: 'mySplitter' },
+          _react2.default.createElement(
+            _reactOnsenui.SplitterSide,
+            {
+              onOpen: function onOpen() {
+                return _this18.setState({ menuOpen: true });
+              },
+              onClose: function onClose() {
+                return _this18.setState({ menuOpen: false });
+              },
+              isOpen: this.state.menuOpen, isSwipeable: true, width: '250px', isCollapsed: true, swipeTargetWidth: 50 },
+            _react2.default.createElement(Menu, _extends({ categories: this.getCategories() }, this.state.filter, {
+              onClickMenuItem: this.changeMenuItem
+            }))
+          ),
+          _react2.default.createElement(
+            _reactOnsenui.SplitterContent,
+            null,
+            _react2.default.createElement(Content, {
+              onItemClick: this.itemClick,
+              onNewClick: this.newClick,
+              onMenuClick: function onMenuClick() {
+                return _this18.setState({ menuOpen: true });
+              },
+              unCompletedTasks: this.filter(this.state.unCompletedTasks),
+              completedTasks: this.filter(this.state.completedTasks),
+              onUnCompleteItem: this.unCompleteItem,
+              onCompleteItem: this.completeItem,
+              onDeleteItem: this.deleteItem })
+          )
+        )
+      );
+    }
+  }]);
+
+  return FirstPage;
+}(_react2.default.Component);
+
+;
+
+var App = function App(props) {
+  return _react2.default.createElement(_reactOnsenui.Navigator, {
+    initialRoute: {
+      component: FirstPage
+    },
+    renderPage: function renderPage(route, navigator) {
+      return _react2.default.createElement(route.component, {
+        prevPage: route.prevPage,
+        navigator: navigator,
+        title: route.title,
+        taskData: route.taskData,
+        editMode: route.editMode
+      });
+    } });
+};
+
+App.propTypes = {
+  children: _react.PropTypes.element
+};
+
+exports.default = App;
+
+},{"onsenui":29,"react":169,"react-dom":30,"react-onsenui":31,"underscore":170}],172:[function(require,module,exports){
 'use strict';
 
 var _react = require('react');
@@ -49907,4 +49826,4 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 _reactDom2.default.render(_react2.default.createElement(_App2.default, null), document.getElementById('app'));
 
-},{"./App.js":171,"onsenui":29,"react":169,"react-dom":30,"react-onsenui":31}]},{},[174]);
+},{"./App.js":171,"onsenui":29,"react":169,"react-dom":30,"react-onsenui":31}]},{},[172]);
